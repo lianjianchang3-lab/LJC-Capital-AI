@@ -46,6 +46,7 @@ def render_home():
     with st.container(border=True):
         st.markdown("### 今日行动")
         c1, c2 = st.columns(2)
+
         with c1:
             st.markdown("#### 🟢 今日买入")
             st.write("300762 上海瀚讯")
@@ -65,12 +66,20 @@ def render_home():
     st.divider()
 
     st.subheader("🥇 Today's Top5")
-    top5 = pd.DataFrame(STOCKS, columns=["代码", "股票", "分层", "LCRI", "Diamond", "Signal", "操作"]).head(5)
+    df = pd.DataFrame(
+        STOCKS,
+        columns=["代码", "股票", "分层", "LCRI", "Diamond", "Signal", "操作"],
+    )
+
+    top5 = df.sort_values("LCRI", ascending=False).head(5)
 
     for i, row in top5.iterrows():
-        medal = ["🥇", "🥈", "🥉", "TOP4", "TOP5"][i]
+        medal = ["🥇", "🥈", "🥉", "TOP4", "TOP5"][len(st.session_state.get("top_counter", []))] if False else None
+
+    medals = ["🥇", "🥈", "🥉", "TOP4", "TOP5"]
+    for idx, (_, row) in enumerate(top5.iterrows()):
         with st.container(border=True):
-            st.markdown(f"### {medal} {row['代码']} {row['股票']}")
+            st.markdown(f"### {medals[idx]} {row['代码']} {row['股票']}")
             c1, c2, c3 = st.columns(3)
             c1.metric("LCRI", row["LCRI"])
             c2.metric("Diamond", row["Diamond"])
