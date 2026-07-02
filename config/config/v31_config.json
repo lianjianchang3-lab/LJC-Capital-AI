@@ -1,0 +1,14 @@
+{
+  "version": "V3.1 RC",
+  "upgrade_threshold": {
+    "diamond_core_lia": 90,
+    "opportunity_lia": 84
+  },
+  "risk": {
+    "low": 25,
+    "medium": 40
+  },
+  "mobile_ui": {
+    "compact": true
+  }
+}
