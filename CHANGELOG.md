@@ -78,3 +78,10 @@
 - Add cloud/live_state.json publisher.
 - Add Cloud Bridge app tab.
 - Add desktop shortcuts for cloud publishing.
+
+## 8.2.0-alpha.1
+
+- Add Sina public realtime quote provider.
+- Add RealtimeQuoteService.
+- Add scripts for one-shot and loop realtime quote updates.
+- Add sidebar button to update realtime quotes.
