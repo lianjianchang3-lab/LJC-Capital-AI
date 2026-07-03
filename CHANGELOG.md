@@ -71,3 +71,10 @@
 - Add AutoImportWatcher.
 - Add automatic inbox CSV import.
 - Add desktop shortcut for opening data/inbox.
+
+## 8.1.0-alpha.3
+
+- Add CloudBridge semi-cloud realtime framework.
+- Add cloud/live_state.json publisher.
+- Add Cloud Bridge app tab.
+- Add desktop shortcuts for cloud publishing.

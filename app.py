@@ -139,3 +139,18 @@ with tab6:
 st.divider()
 st.progress(0.96)
 st.write("V8.0 RC4：系统检查 + 桌面快捷方式完善。")
+
+
+with tab8:
+    st.subheader("Cloud Bridge 云桥同步")
+    st.write("状态：", bridge_status["status"])
+    st.write("更新时间：", bridge_status["updated_at"])
+    st.write(bridge_status["message"])
+    if st.button("立即发布到 Cloud Bridge"):
+        st.write(bridge.publish())
+        st.success("已生成 cloud/live_state.json")
+    data = bridge.load()
+    if isinstance(data, dict):
+        st.caption("云桥数据预览")
+        st.json({k: v for k, v in data.items() if k not in ["quotes", "capital", "portfolio"]})
+    st.warning("当前为半云端实时：Mac负责采集/发布，手机或云端读取。下一步可接 Supabase/Firebase/S3 等真正云数据库。")
