@@ -65,3 +65,9 @@
 - Add release notes.
 - Add release check script.
 - Add desktop shortcut for release check.
+
+## 8.1.0-alpha.2
+
+- Add AutoImportWatcher.
+- Add automatic inbox CSV import.
+- Add desktop shortcut for opening data/inbox.
