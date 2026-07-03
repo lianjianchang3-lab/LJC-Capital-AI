@@ -51,3 +51,10 @@
 - Add system check tab.
 - Add desktop shortcut for health check.
 - Improve release hardening.
+
+## 8.0.0
+
+- Finalize V8.0 Release.
+- Add release notes.
+- Add release check script.
+- Add desktop shortcut for release check.
