@@ -5,7 +5,7 @@ from core import LJCAppCore
 from core.gateway import DataGateway
 from core.ai import V8FinalAI
 from core.health import HealthCheck
-from core.status import DataStatusCenter, DataRefreshGuard
+from core.status import DataStatusCenter
 from core.data_import import InboxImporter, TemplateManager
 
 st.set_page_config(page_title="LJC Capital AI Pro V8 FINAL", page_icon="🚀", layout="wide")
@@ -16,8 +16,6 @@ gateway = DataGateway()
 ai = V8FinalAI(gateway)
 health = HealthCheck().run()
 data_status = DataStatusCenter().status()
-refresh_guard = DataRefreshGuard()
-refresh_status = refresh_guard.all_status()
 war = ai.war_room()
 signals = ai.signals()
 importer = InboxImporter()
@@ -40,12 +38,6 @@ else:
 
 if data_status["issues"]:
     st.caption(" | ".join(data_status["issues"]))
-
-if refresh_status["needs_update"]:
-    st.warning("📥 数据需要更新：请把最新 quotes/capital CSV 放入 data/inbox，然后点击 数据导入 → 导入 inbox CSV。")
-    with st.expander("查看CSV文件状态"):
-        st.dataframe(pd.DataFrame(refresh_status["files"]), use_container_width=True, hide_index=True)
-
 
 st.caption("Release Stabilization｜Data Gateway｜AI统一数据流｜手机/电脑一致")
 
@@ -111,12 +103,6 @@ with tabs[5]:
 with tabs[6]:
     st.header("真实数据导入")
     st.code("data/inbox/")
-    st.subheader("CSV 文件状态")
-    st.dataframe(pd.DataFrame(refresh_status["files"]), use_container_width=True, hide_index=True)
-    if refresh_status["inbox_files"]:
-        st.success("待导入文件：" + ", ".join(refresh_status["inbox_files"]))
-    else:
-        st.info("data/inbox 当前没有待导入 CSV。可双击 scripts/open_data_inbox.command 打开文件夹。")
     names = templates.list_templates()
     if names:
         name = st.selectbox("复制模板到 inbox", names)
@@ -135,8 +121,6 @@ with tabs[7]:
     h4.metric("Freshness", data_status["freshness"])
     st.subheader("Data Status")
     st.json(data_status)
-    st.subheader("Data Refresh Guard")
-    st.json(refresh_status)
     st.subheader("Gateway Health")
     st.json(health)
 
