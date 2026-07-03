@@ -3,11 +3,11 @@ import pandas as pd
 
 from core import LJCAppCore
 from core.data_center import DataCenter
-from core.capital import CapitalEngine
 from core.lia import LIAEngine
 from core.decision import DecisionEngine
 from core.portfolio import PortfolioEngine
 from core.data_import import InboxImporter, TemplateManager
+from core.morning import MorningBrief
 from updater import UpdateService
 
 core = LJCAppCore()
@@ -16,49 +16,73 @@ dc = DataCenter()
 lia_engine = LIAEngine(dc)
 decision_engine = DecisionEngine(lia_engine)
 portfolio_engine = PortfolioEngine(lia_engine=lia_engine)
+brief = MorningBrief(decision_engine)
 updater = UpdateService()
 importer = InboxImporter()
 templates = TemplateManager()
 
-plan = decision_engine.make_plan()
-signals = plan.get("signals", [])
+morning = brief.generate()
+signals = decision_engine.make_plan().get("signals", [])
 
-st.set_page_config(page_title="LJC Capital AI Pro V8 RC1", page_icon="🚀", layout="wide")
+st.set_page_config(page_title="LJC Capital AI Pro V8", page_icon="🚀", layout="wide")
 
-st.title("🚀 LJC Capital AI Pro V8.0 RC1")
-st.caption("真实数据 Inbox｜LIA｜今日作战计划")
+st.title("🚀 LJC Capital AI Pro V8.0")
+st.caption("Release Candidate｜Morning Brief｜真实数据｜一键启动")
 
-with st.container(border=True):
+tab0, tab1, tab2, tab3, tab4, tab5 = st.tabs([
+    "晨会首页", "今日决策", "LIA排行", "我的持仓", "真实数据导入", "更新中心"
+])
+
+with tab0:
+    st.header("☀️ LJC Morning Brief")
+    c1, c2, c3 = st.columns(3)
+    c1.metric("市场状态", morning["market"])
+    c2.metric("建议仓位", morning["position"])
+    c3.metric("风险", morning["risk"])
+
+    st.info(morning["summary"])
+
+    st.subheader("💎 Diamond")
+    if morning["diamond"]:
+        for s in morning["diamond"]:
+            with st.container(border=True):
+                st.markdown(f"### {s.code} {s.name}｜LIA {s.lia}")
+                a, b, c, d = st.columns(4)
+                a.metric("资金", s.capital)
+                b.metric("趋势", s.trend)
+                c.metric("板块", s.sector)
+                d.metric("可信度", s.confidence)
+                st.write(s.action)
+                st.caption(s.explanation)
+    else:
+        st.write("暂无 Diamond。")
+
+    st.subheader("🚀 Opportunity")
+    if morning["opportunity"]:
+        for s in morning["opportunity"]:
+            st.write(f"{s.code} {s.name}｜LIA {s.lia}｜{s.action}")
+    else:
+        st.write("暂无 Opportunity。")
+
+    st.subheader("👀 Watch")
+    if morning["watch"]:
+        for s in morning["watch"]:
+            st.write(f"{s.code} {s.name}｜LIA {s.lia}｜{s.action}")
+    else:
+        st.write("暂无 Watch。")
+
+    st.subheader("⚠️ 今日纪律")
+    st.write("不追高；优先看资金连续性；真实数据导入后再做最终判断。")
+
+with tab1:
+    plan = decision_engine.make_plan()
     st.subheader("今日作战计划")
     c1, c2, c3, c4 = st.columns(4)
     c1.metric("市场", plan["market"])
-    c2.metric("建议仓位", plan["position"])
+    c2.metric("仓位", plan["position"])
     c3.metric("风险", plan["risk"])
     c4.metric("版本", boot["version"])
     st.write(plan["summary"])
-
-tab1, tab2, tab3, tab4, tab5 = st.tabs(["今日决策", "LIA排行", "我的持仓", "真实数据导入", "更新中心"])
-
-with tab1:
-    st.subheader("💎 Diamond")
-    for s in plan["diamond"]:
-        with st.container(border=True):
-            st.markdown(f"### {s.code} {s.name}｜LIA {s.lia}")
-            a, b, c, d = st.columns(4)
-            a.metric("资金", s.capital)
-            b.metric("趋势", s.trend)
-            c.metric("板块", s.sector)
-            d.metric("可信度", s.confidence)
-            st.write(s.action)
-            st.caption(s.explanation)
-
-    st.subheader("🚀 Opportunity")
-    for s in plan["opportunity"]:
-        st.write(f"{s.code} {s.name}｜LIA {s.lia}｜{s.action}")
-
-    st.subheader("👀 Watch")
-    for s in plan["watch"]:
-        st.write(f"{s.code} {s.name}｜LIA {s.lia}｜{s.action}")
 
 with tab2:
     rows = [{
@@ -82,9 +106,8 @@ with tab3:
 
 with tab4:
     st.subheader("真实数据导入")
-    st.write("把同花顺 / Moomoo / 持仓 CSV 放入：")
+    st.write("把同花顺 / Moomoo / 东方财富 / 持仓 CSV 放入：")
     st.code("data/inbox/")
-    st.write("系统会自动识别：行情、资金、持仓。")
 
     st.markdown("#### CSV 模板")
     names = templates.list_templates()
@@ -101,14 +124,13 @@ with tab4:
         st.write(result)
         st.success("导入完成。请刷新页面查看最新分析。")
 
-    st.caption("导入后文件会移动到 data/processed/，避免重复导入。")
-
 with tab5:
-    status = updater.check()
-    st.write(status)
+    st.subheader("更新中心")
+    st.write(updater.check())
+    st.code("桌面快捷方式：LJC Update.command")
     if st.button("手动拉取 develop 更新"):
         st.code(updater.pull())
 
-st.subheader("V8.0 Progress")
-st.progress(0.82)
-st.write("RC1：真实数据导入已安装。下一步：数据模板与模型校准。")
+st.divider()
+st.progress(0.92)
+st.write("V8.0 Release Candidate：一键启动 + Morning Brief 已安装。")

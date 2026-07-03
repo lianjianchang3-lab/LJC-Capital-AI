@@ -37,3 +37,10 @@
 - Add TemplateManager.
 - Improve inbox importer numeric cleaning for %, 亿, 万.
 - Add template UI in Real Data Import tab.
+
+## 8.0.0-rc3
+
+- Add Morning Brief homepage.
+- Add one-click start command.
+- Add one-click update command.
+- Add desktop shortcut creator.
