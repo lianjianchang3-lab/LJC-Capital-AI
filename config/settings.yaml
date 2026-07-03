@@ -1,0 +1,37 @@
+app:
+  name: "LJC Capital AI Pro"
+  version: "8.0.0-alpha.1"
+  mode: "development"
+
+data:
+  primary_source: "csv"
+  fallback_source: "csv"
+  cache_seconds: 60
+
+watchlist:
+  - code: "300136"
+    name: "信维通信"
+  - code: "300762"
+    name: "上海瀚讯"
+  - code: "688008"
+    name: "澜起科技"
+  - code: "603308"
+    name: "应流股份"
+  - code: "688387"
+    name: "信科移动"
+  - code: "300342"
+    name: "天银机电"
+  - code: "688568"
+    name: "中科星图"
+
+lia:
+  weights:
+    capital: 0.40
+    trend: 0.25
+    sector: 0.15
+    event: 0.10
+    risk: 0.10
+
+ota:
+  enabled: false
+  channel: "develop"

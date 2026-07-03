@@ -3,4 +3,4 @@ pandas
 requests
 akshare
 plotly
-PyYAML
+PyYAMLpyyaml
