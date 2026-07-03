@@ -10,3 +10,9 @@
 - Add CSVProvider.
 - Add DataQuality and DataResult.
 - Add unified DataCenter API.
+
+## 8.0.0-alpha.3
+
+- Add Build003 Capital Engine.
+- Add Capital Health, Institution Score, Confidence, Stage.
+- Connect Capital Engine to Data Center.
