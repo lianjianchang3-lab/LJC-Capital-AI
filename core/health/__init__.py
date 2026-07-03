@@ -1,3 +1,5 @@
-from core.health.health_check import HealthCheck
+from core.gateway import DataGateway
 
-__all__ = ["HealthCheck"]
+class HealthCheck:
+    def run(self):
+        return DataGateway().health()

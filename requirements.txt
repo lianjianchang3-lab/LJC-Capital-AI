@@ -1,6 +1,5 @@
 streamlit
 pandas
 requests
-akshare
 plotly
-PyYAMLpyyaml
+PyYAML
