@@ -85,3 +85,9 @@
 - Add RealtimeQuoteService.
 - Add scripts for one-shot and loop realtime quote updates.
 - Add sidebar button to update realtime quotes.
+
+## 8.2.0-alpha.2
+
+- Add Pure Cloud Realtime service.
+- Add mobile/cloud realtime tab.
+- Streamlit Cloud can directly fetch public quote snapshots.

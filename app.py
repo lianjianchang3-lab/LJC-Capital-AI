@@ -154,3 +154,19 @@ with tab8:
         st.caption("云桥数据预览")
         st.json({k: v for k, v in data.items() if k not in ["quotes", "capital", "portfolio"]})
     st.warning("当前为半云端实时：Mac负责采集/发布，手机或云端读取。下一步可接 Supabase/Firebase/S3 等真正云数据库。")
+
+
+with tab9:
+    st.subheader("📱 手机端云端实时")
+    st.write("此页面不依赖 Mac 后台更新，直接由 Streamlit Cloud / 手机端抓取公开行情快照。")
+    live_rows, live_status = cloud_rt.merge_with_lia(signals)
+    c1, c2, c3 = st.columns(3)
+    c1.metric("状态", "正常" if live_status.get("ok") else "失败")
+    c2.metric("来源", live_status.get("source", ""))
+    c3.metric("更新时间", live_status.get("updated_at", ""))
+    st.caption(live_status.get("message", ""))
+    if live_rows:
+        st.dataframe(pd.DataFrame(live_rows), use_container_width=True, hide_index=True)
+    else:
+        st.warning("暂未获取到云端实时行情。可稍后刷新，或检查 Streamlit Cloud 是否允许访问外部行情接口。")
+    st.info("当前为公开行情快照，不是Level-2逐笔资金。资金实时需要后续接入付费数据源/Moomoo/Supabase等。")
