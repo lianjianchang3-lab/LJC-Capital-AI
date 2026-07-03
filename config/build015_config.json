@@ -1,0 +1,8 @@
+{
+  "version": "Professional Build015",
+  "data_mode": "csv",
+  "diamond_lia": 90,
+  "opportunity_lia": 84,
+  "low_risk": 25,
+  "medium_risk": 40
+}

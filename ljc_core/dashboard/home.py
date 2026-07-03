@@ -1,5 +1,6 @@
 import streamlit as st
 from ljc_core.engine.decision_engine import DecisionEngine
+from ljc_core.engine.report_engine import ReportEngine
 
 
 def _style():
@@ -16,27 +17,31 @@ def _style():
 
 
 def _card(row):
+    pos = ""
+    if row.get("cost", "-") != "-":
+        pos = f"｜成本 {row['cost']}｜盈亏 {row['pnl_pct']}%｜目标仓 {row.get('target_weight','-')}%"
     st.markdown(
         f'''<div class="card"><b>{row["code"]} {row["name"]}</b>｜{row["pool"]}｜LIA {row["lia"]}｜资金健康 {row["capital_health"]}<br>
-        <span class="muted">现价：{row["close"]}｜涨跌：{row["change_pct"]}%｜动作：{row["action"]}</span><br>
-        <span class="muted">1日 {row["mf_1d"]}亿｜3日 {row["mf_3d"]}亿｜5日 {row["mf_5d"]}亿｜{row["capital_state"]}</span><br>
+        <span class="muted">现价：{row["close"]}｜涨跌：{row["change_pct"]}%{pos}｜动作：{row["action"]}</span><br>
+        <span class="muted">1日 {row["mf_1d"]}亿｜3日 {row["mf_3d"]}亿｜5日 {row["mf_5d"]}亿｜10日 {row["mf_10d"]}亿｜{row["capital_state"]}</span><br>
         <span class="muted">证据：{row["evidence"]}</span></div>''',
         unsafe_allow_html=True,
     )
 
 
 def render_home():
-    st.set_page_config(page_title="LJC Capital AI Pro V4.0", page_icon="🚀", layout="wide")
+    st.set_page_config(page_title="LJC Professional Build015", page_icon="🚀", layout="wide")
     _style()
     data = DecisionEngine().run()
+    ReportEngine().build_daily_report(data)
     wr = data["war_room"]
 
-    st.markdown("### 🚀 LJC Capital AI Pro V4.0")
-    st.caption("Core Clean Edition｜统一 ljc_core｜CSV数据驱动")
+    st.markdown("### 🚀 LJC Capital AI Professional Build015")
+    st.caption("统一 ljc_core｜数据层｜持仓中心｜日报框架｜主力资金纵向跟踪")
 
     st.markdown("#### 🧠 War Room")
     with st.container(border=True):
-        c1, c2, c3, c4 = st.columns(4)
+        c1,c2,c3,c4 = st.columns(4)
         c1.metric("市场", wr["market"])
         c2.metric("仓位", wr["position"])
         c3.metric("主线", wr["theme"])
@@ -60,6 +65,8 @@ def render_home():
     for r in data["watch"]:
         _card(r)
 
-    st.markdown("#### 📊 数据说明")
+    st.markdown("#### 🗂 数据更新中心")
     with st.container(border=True):
-        st.caption("V4.0 已统一入口：ljc_core。数据优先读取项目 data/，没有则读取 ljc_core/data/。")
+        for s in data["data_status"]:
+            st.caption(("✅ " if s["exists"] else "❌ ") + s["file"])
+        st.caption("日报已生成到 reports/daily_report.md")
