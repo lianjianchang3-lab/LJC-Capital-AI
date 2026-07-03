@@ -5,7 +5,6 @@ from core import LJCAppCore
 from core.gateway import DataGateway
 from core.ai import V8FinalAI
 from core.health import HealthCheck
-from core.status import DataStatusCenter
 from core.data_import import InboxImporter, TemplateManager
 
 st.set_page_config(page_title="LJC Capital AI Pro V8 FINAL", page_icon="🚀", layout="wide")
@@ -15,30 +14,12 @@ boot = core.boot()
 gateway = DataGateway()
 ai = V8FinalAI(gateway)
 health = HealthCheck().run()
-data_status = DataStatusCenter().status()
 war = ai.war_room()
 signals = ai.signals()
 importer = InboxImporter()
 templates = TemplateManager()
 
 st.title("🚀 LJC Capital AI Pro V8.0 FINAL RC")
-
-st.markdown("### 📡 Data Status Center")
-ds1, ds2, ds3, ds4, ds5 = st.columns(5)
-ds1.metric("Mode", data_status["mode"])
-ds2.metric("Source", data_status["source"])
-ds3.metric("Data Date", data_status["data_date"])
-ds4.metric("Updated", data_status["updated_at"])
-ds5.metric("Realtime", "ON" if data_status["realtime"] else "OFF")
-
-if data_status["stale"] or not data_status["realtime"]:
-    st.error("⚠ 当前为 CSV 本地数据 / 非实时行情。数据可能不是今日行情，禁止直接作为实盘交易依据。")
-else:
-    st.success("✅ 当前为实时数据模式。")
-
-if data_status["issues"]:
-    st.caption(" | ".join(data_status["issues"]))
-
 st.caption("Release Stabilization｜Data Gateway｜AI统一数据流｜手机/电脑一致")
 
 if health["score"] < 90:
@@ -51,7 +32,7 @@ with tabs[0]:
     c1, c2, c3, c4 = st.columns(4)
     c1.metric("市场", war["market"])
     c2.metric("建议仓位", war["position"])
-    c3.metric("Health", data_status["health"])
+    c3.metric("Health", health["score"])
     c4.metric("Version", boot["version"])
 
     rows = [{
@@ -114,14 +95,6 @@ with tabs[6]:
 
 with tabs[7]:
     st.header("Health")
-    h1, h2, h3, h4 = st.columns(4)
-    h1.metric("System Health", data_status["health"])
-    h2.metric("Realtime", "ON" if data_status["realtime"] else "OFF")
-    h3.metric("Provider", data_status["provider"])
-    h4.metric("Freshness", data_status["freshness"])
-    st.subheader("Data Status")
-    st.json(data_status)
-    st.subheader("Gateway Health")
     st.json(health)
 
 st.divider()
