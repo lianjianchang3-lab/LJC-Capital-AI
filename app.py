@@ -7,24 +7,25 @@ from core.capital import CapitalEngine
 from core.lia import LIAEngine
 from core.decision import DecisionEngine
 from core.portfolio import PortfolioEngine
+from core.data_import import InboxImporter
 from updater import UpdateService
 
 core = LJCAppCore()
 boot = core.boot()
 dc = DataCenter()
-capital_engine = CapitalEngine(dc)
 lia_engine = LIAEngine(dc)
 decision_engine = DecisionEngine(lia_engine)
 portfolio_engine = PortfolioEngine(lia_engine=lia_engine)
 updater = UpdateService()
+importer = InboxImporter()
 
 plan = decision_engine.make_plan()
 signals = plan.get("signals", [])
 
-st.set_page_config(page_title="LJC Capital AI Pro V8", page_icon="🚀", layout="wide")
+st.set_page_config(page_title="LJC Capital AI Pro V8 RC1", page_icon="🚀", layout="wide")
 
-st.title("🚀 LJC Capital AI Pro V8.0")
-st.caption("Build005-008｜LIA / Decision / Portfolio / OTA")
+st.title("🚀 LJC Capital AI Pro V8.0 RC1")
+st.caption("真实数据 Inbox｜LIA｜今日作战计划")
 
 with st.container(border=True):
     st.subheader("今日作战计划")
@@ -35,7 +36,7 @@ with st.container(border=True):
     c4.metric("版本", boot["version"])
     st.write(plan["summary"])
 
-tab1, tab2, tab3, tab4 = st.tabs(["今日决策", "LIA排行", "我的持仓", "更新中心"])
+tab1, tab2, tab3, tab4, tab5 = st.tabs(["今日决策", "LIA排行", "我的持仓", "真实数据导入", "更新中心"])
 
 with tab1:
     st.subheader("💎 Diamond")
@@ -76,15 +77,26 @@ with tab2:
 
 with tab3:
     st.dataframe(portfolio_engine.analyze(), use_container_width=True, hide_index=True)
-    st.caption("可编辑 data/portfolio.csv 来维护真实持仓。")
+    st.caption("真实持仓可放入 data/inbox/，文件名包含 portfolio 或 持仓。")
 
 with tab4:
+    st.subheader("真实数据导入")
+    st.write("把同花顺 / Moomoo / 持仓 CSV 放入：")
+    st.code("data/inbox/")
+    st.write("系统会自动识别：行情、资金、持仓。")
+    if st.button("导入 inbox CSV 并刷新数据"):
+        result = importer.import_all()
+        st.write(result)
+        st.success("导入完成。请刷新页面查看最新分析。")
+
+    st.caption("导入后文件会移动到 data/processed/，避免重复导入。")
+
+with tab5:
     status = updater.check()
     st.write(status)
-    st.caption("Build008 已建立 OTA 框架；当前为手动安全模式。")
     if st.button("手动拉取 develop 更新"):
         st.code(updater.pull())
 
 st.subheader("V8.0 Progress")
-st.progress(0.72)
-st.write("Build005 LIA Engine ✅ | Build006 Decision ✅ | Build007 Portfolio ✅ | Build008 OTA Framework ✅")
+st.progress(0.82)
+st.write("RC1：真实数据导入已安装。下一步：数据模板与模型校准。")

@@ -24,3 +24,9 @@
 - Add Build007 Portfolio Engine.
 - Add Build008 OTA framework.
 - Upgrade homepage to daily trading plan.
+
+## 8.0.0-rc1
+
+- Add Real Data Inbox importer.
+- Support auto-detect quotes / capital / portfolio CSV.
+- Add app tab for real data import.
