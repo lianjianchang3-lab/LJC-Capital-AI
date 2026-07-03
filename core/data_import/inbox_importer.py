@@ -33,6 +33,26 @@ class InboxImporter:
                 last_error = e
         raise last_error
 
+
+    def _num(self, value):
+        try:
+            if value is None:
+                return 0.0
+            s = str(value).strip().replace(",", "").replace("，", "")
+            if s in ["", "-", "--", "nan", "None"]:
+                return 0.0
+            s = s.replace("%", "")
+            unit = 1.0
+            if "亿" in s:
+                unit = 1.0
+                s = s.replace("亿", "")
+            elif "万" in s:
+                unit = 0.0001
+                s = s.replace("万", "")
+            return float(s) * unit
+        except Exception:
+            return 0.0
+
     def _normalize_code(self, s):
         return str(s).replace(".SZ", "").replace(".SH", "").replace("SZ", "").replace("SH", "").zfill(6)
 
@@ -60,10 +80,10 @@ class InboxImporter:
     def normalize_quotes(self, df):
         code_col = self._pick(df, ["code", "代码", "证券代码"])
         name_col = self._pick(df, ["name", "名称", "证券名称"])
-        close_col = self._pick(df, ["close", "最新价", "现价", "收盘价"])
-        chg_col = self._pick(df, ["change_pct", "涨跌幅", "涨幅"])
-        vr_col = self._pick(df, ["volume_ratio", "量比"])
-        turnover_col = self._pick(df, ["turnover", "成交额", "成交额(亿)"])
+        close_col = self._pick(df, ["close", "最新价", "现价", "收盘价", "最新", "价格"])
+        chg_col = self._pick(df, ["change_pct", "涨跌幅", "涨幅", "涨跌幅(%)"])
+        vr_col = self._pick(df, ["volume_ratio", "量比", "量比指标"])
+        turnover_col = self._pick(df, ["turnover", "成交额", "成交额(亿)", "成交金额"])
 
         rows = []
         today = datetime.now().strftime("%Y-%m-%d")
@@ -84,22 +104,22 @@ class InboxImporter:
     def normalize_capital(self, df):
         code_col = self._pick(df, ["code", "代码", "证券代码"])
         name_col = self._pick(df, ["name", "名称", "证券名称"])
-        super_col = self._pick(df, ["super_large", "特大单", "超大单", "超大单净额"])
-        large_col = self._pick(df, ["large", "大单", "大单净额"])
-        medium_col = self._pick(df, ["medium", "中单", "中单净额"])
-        small_col = self._pick(df, ["small", "小单", "小单净额"])
-        net_col = self._pick(df, ["net_main", "主力净流入", "主力净额", "主力资金净流入"])
+        super_col = self._pick(df, ["super_large", "特大单", "超大单", "超大单净额", "特大单净额", "Super Large"])
+        large_col = self._pick(df, ["large", "大单", "大单净额", "Large"])
+        medium_col = self._pick(df, ["medium", "中单", "中单净额", "Medium"])
+        small_col = self._pick(df, ["small", "小单", "小单净额", "Small"])
+        net_col = self._pick(df, ["net_main", "主力净流入", "主力净额", "主力资金净流入", "主力净流入(亿)", "Main Net"])
 
         rows = []
         today = datetime.now().strftime("%Y-%m-%d")
         for _, r in df.iterrows():
             if not code_col:
                 continue
-            super_large = pd.to_numeric(r.get(super_col, 0), errors="coerce") if super_col else 0
-            large = pd.to_numeric(r.get(large_col, 0), errors="coerce") if large_col else 0
-            medium = pd.to_numeric(r.get(medium_col, 0), errors="coerce") if medium_col else 0
-            small = pd.to_numeric(r.get(small_col, 0), errors="coerce") if small_col else 0
-            net_main = pd.to_numeric(r.get(net_col, 0), errors="coerce") if net_col else super_large + large
+            super_large = self._num(r.get(super_col, 0)) if super_col else 0
+            large = self._num(r.get(large_col, 0)) if large_col else 0
+            medium = self._num(r.get(medium_col, 0)) if medium_col else 0
+            small = self._num(r.get(small_col, 0)) if small_col else 0
+            net_main = self._num(r.get(net_col, 0)) if net_col else super_large + large
 
             rows.append({
                 "date": today,

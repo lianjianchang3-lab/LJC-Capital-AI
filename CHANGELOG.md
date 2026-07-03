@@ -30,3 +30,10 @@
 - Add Real Data Inbox importer.
 - Support auto-detect quotes / capital / portfolio CSV.
 - Add app tab for real data import.
+
+## 8.0.0-rc2
+
+- Add THS / Moomoo / Eastmoney / Quotes / Portfolio CSV templates.
+- Add TemplateManager.
+- Improve inbox importer numeric cleaning for %, 亿, 万.
+- Add template UI in Real Data Import tab.

@@ -7,7 +7,7 @@ from core.capital import CapitalEngine
 from core.lia import LIAEngine
 from core.decision import DecisionEngine
 from core.portfolio import PortfolioEngine
-from core.data_import import InboxImporter
+from core.data_import import InboxImporter, TemplateManager
 from updater import UpdateService
 
 core = LJCAppCore()
@@ -18,6 +18,7 @@ decision_engine = DecisionEngine(lia_engine)
 portfolio_engine = PortfolioEngine(lia_engine=lia_engine)
 updater = UpdateService()
 importer = InboxImporter()
+templates = TemplateManager()
 
 plan = decision_engine.make_plan()
 signals = plan.get("signals", [])
@@ -84,6 +85,17 @@ with tab4:
     st.write("把同花顺 / Moomoo / 持仓 CSV 放入：")
     st.code("data/inbox/")
     st.write("系统会自动识别：行情、资金、持仓。")
+
+    st.markdown("#### CSV 模板")
+    names = templates.list_templates()
+    if names:
+        selected_template = st.selectbox("选择模板复制到 inbox", names)
+        if st.button("复制模板到 inbox"):
+            st.write(templates.copy_template_to_inbox(selected_template))
+    else:
+        st.warning("未找到模板文件。")
+
+    st.markdown("#### 导入")
     if st.button("导入 inbox CSV 并刷新数据"):
         result = importer.import_all()
         st.write(result)
