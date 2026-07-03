@@ -44,3 +44,10 @@
 - Add one-click start command.
 - Add one-click update command.
 - Add desktop shortcut creator.
+
+## 8.0.0-rc4
+
+- Add HealthCheck module.
+- Add system check tab.
+- Add desktop shortcut for health check.
+- Improve release hardening.
