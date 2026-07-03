@@ -1,75 +1,90 @@
 import streamlit as st
 import pandas as pd
+
 from core import LJCAppCore
 from core.data_center import DataCenter
 from core.capital import CapitalEngine
+from core.lia import LIAEngine
+from core.decision import DecisionEngine
+from core.portfolio import PortfolioEngine
+from updater import UpdateService
 
 core = LJCAppCore()
 boot = core.boot()
 dc = DataCenter()
 capital_engine = CapitalEngine(dc)
-health = dc.health_check()
-signals = capital_engine.analyze_all()
+lia_engine = LIAEngine(dc)
+decision_engine = DecisionEngine(lia_engine)
+portfolio_engine = PortfolioEngine(lia_engine=lia_engine)
+updater = UpdateService()
+
+plan = decision_engine.make_plan()
+signals = plan.get("signals", [])
 
 st.set_page_config(page_title="LJC Capital AI Pro V8", page_icon="🚀", layout="wide")
 
 st.title("🚀 LJC Capital AI Pro V8.0")
-st.caption("Build003 Capital Engine｜资金健康 / 机构评分 / 吸筹阶段")
+st.caption("Build005-008｜LIA / Decision / Portfolio / OTA")
 
 with st.container(border=True):
-    st.subheader("System Status")
-    c1, c2, c3 = st.columns(3)
-    c1.metric("Version", boot["version"])
-    c2.metric("Data Quality", health["overall_score"])
-    c3.metric("Capital Signals", len(signals))
+    st.subheader("今日作战计划")
+    c1, c2, c3, c4 = st.columns(4)
+    c1.metric("市场", plan["market"])
+    c2.metric("建议仓位", plan["position"])
+    c3.metric("风险", plan["risk"])
+    c4.metric("版本", boot["version"])
+    st.write(plan["summary"])
 
-st.subheader("🧠 Capital Engine")
-rows = []
-for s in signals:
-    rows.append({
+tab1, tab2, tab3, tab4 = st.tabs(["今日决策", "LIA排行", "我的持仓", "更新中心"])
+
+with tab1:
+    st.subheader("💎 Diamond")
+    for s in plan["diamond"]:
+        with st.container(border=True):
+            st.markdown(f"### {s.code} {s.name}｜LIA {s.lia}")
+            a, b, c, d = st.columns(4)
+            a.metric("资金", s.capital)
+            b.metric("趋势", s.trend)
+            c.metric("板块", s.sector)
+            d.metric("可信度", s.confidence)
+            st.write(s.action)
+            st.caption(s.explanation)
+
+    st.subheader("🚀 Opportunity")
+    for s in plan["opportunity"]:
+        st.write(f"{s.code} {s.name}｜LIA {s.lia}｜{s.action}")
+
+    st.subheader("👀 Watch")
+    for s in plan["watch"]:
+        st.write(f"{s.code} {s.name}｜LIA {s.lia}｜{s.action}")
+
+with tab2:
+    rows = [{
         "代码": s.code,
         "名称": s.name,
-        "资金健康": s.capital_health,
-        "机构评分": s.institution_score,
-        "可信度": s.confidence,
-        "阶段": s.stage,
+        "LIA": s.lia,
+        "资金": s.capital,
         "趋势": s.trend,
-        "连续性": s.continuity_stars,
-        "主力净流入(亿)": s.net_main,
+        "板块": s.sector,
+        "风险安全": s.risk,
+        "可信度": s.confidence,
+        "评级": s.rank,
+        "建议": s.action,
         "说明": s.explanation,
-    })
+    } for s in signals]
+    st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
 
-df = pd.DataFrame(rows)
-if not df.empty:
-    df = df.sort_values(["资金健康", "可信度"], ascending=False)
-    st.dataframe(df, use_container_width=True, hide_index=True)
+with tab3:
+    st.dataframe(portfolio_engine.analyze(), use_container_width=True, hide_index=True)
+    st.caption("可编辑 data/portfolio.csv 来维护真实持仓。")
 
-st.subheader("Diamond / Opportunity / Watch")
-for s in signals:
-    if s.capital_health >= 90:
-        bucket = "💎 Diamond Core"
-    elif s.capital_health >= 75:
-        bucket = "🚀 Opportunity"
-    else:
-        bucket = "👀 Watch"
-
-    with st.container(border=True):
-        st.markdown(f"### {bucket}｜{s.code} {s.name}")
-        a, b, c, d = st.columns(4)
-        a.metric("资金健康", s.capital_health)
-        b.metric("机构评分", s.institution_score)
-        c.metric("可信度", s.confidence)
-        d.metric("阶段", s.stage)
-        st.caption(f"趋势：{s.trend}｜连续性：{s.continuity_stars}")
-        st.write(s.explanation)
-
-with st.expander("Data Center 原始数据"):
-    st.write("Capital")
-    st.dataframe(dc.get_capital().data, use_container_width=True)
-    st.write("Quotes")
-    st.dataframe(dc.get_quotes().data, use_container_width=True)
+with tab4:
+    status = updater.check()
+    st.write(status)
+    st.caption("Build008 已建立 OTA 框架；当前为手动安全模式。")
+    if st.button("手动拉取 develop 更新"):
+        st.code(updater.pull())
 
 st.subheader("V8.0 Progress")
-st.progress(0.32)
-st.write("Build003 Capital Engine: 已安装")
-st.write("下一步：Build004 LIA Engine")
+st.progress(0.72)
+st.write("Build005 LIA Engine ✅ | Build006 Decision ✅ | Build007 Portfolio ✅ | Build008 OTA Framework ✅")

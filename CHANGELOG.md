@@ -16,3 +16,11 @@
 - Add Build003 Capital Engine.
 - Add Capital Health, Institution Score, Confidence, Stage.
 - Connect Capital Engine to Data Center.
+
+## 8.0.0-alpha.8
+
+- Add Build005 LIA Engine.
+- Add Build006 Decision Engine.
+- Add Build007 Portfolio Engine.
+- Add Build008 OTA framework.
+- Upgrade homepage to daily trading plan.
