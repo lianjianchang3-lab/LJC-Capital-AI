@@ -1,0 +1,6 @@
+models:
+  lcri: 0.35
+  trend: 0.20
+  capital: 0.15
+  lia: 0.15
+  risk: 0.15
