@@ -6,7 +6,6 @@ from core.gateway import DataGateway
 from core.ai import V8FinalAI
 from core.health import HealthCheck
 from core.status import DataStatusCenter, DataRefreshGuard
-from core.validation import DataIntegrityValidator, ReleaseValidationCenter
 from core.data_import import InboxImporter, TemplateManager
 
 st.set_page_config(page_title="LJC Capital AI Pro V8 FINAL", page_icon="🚀", layout="wide")
@@ -19,8 +18,6 @@ health = HealthCheck().run()
 data_status = DataStatusCenter().status()
 refresh_guard = DataRefreshGuard()
 refresh_status = refresh_guard.all_status()
-data_integrity = DataIntegrityValidator().validate()
-release_validation = ReleaseValidationCenter().validate()
 war = ai.war_room()
 signals = ai.signals()
 importer = InboxImporter()
@@ -55,7 +52,7 @@ st.caption("Release Stabilization｜Data Gateway｜AI统一数据流｜手机/�
 if health["score"] < 90:
     st.warning(f"系统健康度 {health['score']}｜问题：{', '.join(health['issues']) or '无'}")
 
-tabs = st.tabs(["War Room", "Diamond", "Opportunity", "Watch", "Portfolio", "Data Gateway", "数据导入", "Health", "Release Validation"])
+tabs = st.tabs(["War Room", "Diamond", "Opportunity", "Watch", "Portfolio", "Data Gateway", "数据导入", "Health"])
 
 with tabs[0]:
     st.header("War Room")
@@ -145,18 +142,3 @@ with tabs[7]:
 
 st.divider()
 st.write("V8.0 FINAL RC：新功能冻结。当前补丁完成 Data Gateway 与稳定入口。")
-
-
-with tabs[8]:
-    st.header("✅ Release Validation")
-    st.metric("Overall", release_validation["overall"])
-    st.subheader("Release Checks")
-    st.dataframe(pd.DataFrame(release_validation["checks"]), use_container_width=True, hide_index=True)
-
-    st.subheader("Data Integrity")
-    st.dataframe(pd.DataFrame(data_integrity["checks"]), use_container_width=True, hide_index=True)
-
-    if release_validation["pass"]:
-        st.success("V8.0 FINAL RC 当前通过发布验收。")
-    else:
-        st.error("V8.0 FINAL RC 尚未通过发布验收，请先修复 FAILED 项。")
