@@ -1,7 +1,3 @@
-from core.workbench import WorkbenchEngine
-from core.strategy_v3 import MasterStrategyV3, ScoreV3, EntryExitEngine
-from core.selection import SelectionCenter
-from core.portfolio_v3 import PortfolioManagerV3
 from core.ui import CommercialUIData
 import streamlit as st
 import pandas as pd
@@ -461,49 +457,3 @@ try:
         """)
 except Exception as e:
     st.error(f"V8.1 Phase 4 Commercial UI 加载失败：{e}")
-
-# ==============================
-# V8.1 Build031-070 Strategy Workbench
-# ==============================
-try:
-    st.divider()
-    st.header("🧭 V8.1 Build031-070 Strategy Workbench")
-    wb = WorkbenchEngine()
-    master_v3 = MasterStrategyV3()
-    score_v3 = ScoreV3()
-    entry_exit = EntryExitEngine()
-    selection_center = SelectionCenter()
-    portfolio_v3 = PortfolioManagerV3()
-
-    btabs = st.tabs(["Master V3", "Entry/Exit", "Score V3", "Selection", "Portfolio V3", "Daily Workbench", "Report Export"])
-
-    with btabs[0]:
-        st.subheader("Build031-040 Master Strategy V3")
-        st.json(master_v3.generate())
-
-    with btabs[1]:
-        st.subheader("Buy/Sell Plan")
-        st.dataframe(pd.DataFrame(entry_exit.plans()), use_container_width=True, hide_index=True)
-
-    with btabs[2]:
-        st.subheader("AI Investment Score V3")
-        st.dataframe(score_v3.table(), use_container_width=True, hide_index=True)
-
-    with btabs[3]:
-        st.subheader("Build041-050 Selection Center")
-        st.json(selection_center.scan())
-
-    with btabs[4]:
-        st.subheader("Build051-060 Portfolio Manager V3")
-        st.json(portfolio_v3.analyze())
-
-    with btabs[5]:
-        st.subheader("Build061-070 Daily Workbench")
-        st.json(wb.daily_plan())
-
-    with btabs[6]:
-        st.subheader("Markdown Report")
-        st.code(wb.report_markdown(), language="markdown")
-
-except Exception as e:
-    st.error(f"V8.1 Build031-070 加载失败：{e}")
