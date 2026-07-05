@@ -1,6 +1,3 @@
-try:
-    from core.pro_v20.report.morning_report import ProMorningReport
-except Exception:
-    ProMorningReport = None
+from core.pro_v20.report.morning_report import ProMorningReport, MorningReport
 
-__all__ = ["ProMorningReport"]
+__all__ = ["ProMorningReport", "MorningReport"]
