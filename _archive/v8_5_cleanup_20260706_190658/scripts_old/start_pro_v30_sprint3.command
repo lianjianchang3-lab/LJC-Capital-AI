@@ -3,4 +3,4 @@ set -e
 cd "$HOME/LJC-Capital-AI"
 source .venv/bin/activate 2>/dev/null || true
 export PYTHONPATH="$PWD"
-python -m streamlit run app.py
+python -m streamlit run apps/pro_v30_sprint3.py
